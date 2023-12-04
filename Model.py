@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.api import VAR
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+import numpy as np
+
 
 def ARIMAM(filepath):
     # 데이터 전처리
@@ -61,6 +64,26 @@ def VARM(filepath):
     var_predictions_df = pd.DataFrame(var_predictions, index=multivariate_test.index, columns=multivariate_test.columns)
     
     return var_model_fit, multivariate_train, multivariate_test, var_predictions_df
+
+def EstimateRMSE(arimaPrediction,varPrediction,actualData):
+    # ARIMA 모델의 예측값 (이전에 계산한 predictions 변수 사용)
+    arima_predictions = arimaPrediction
+
+    # VAR 모델의 예측값
+    var_predictions_total = varPrediction['MOVIE_ADNC_CO']
+
+    # 실제 2023년 데이터
+    actual = actualData
+
+    # ARIMA 모델의 성능 평가
+    arima_mse = mean_squared_error(actual, arima_predictions)
+    arima_rmse = np.sqrt(arima_mse)
+
+    # VAR 모델의 성능 평가
+    var_mse = mean_squared_error(actual, var_predictions_total)
+    var_rmse = np.sqrt(var_mse)
+
+    return arima_rmse, var_rmse
 
 
 
