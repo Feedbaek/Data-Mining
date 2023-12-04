@@ -67,9 +67,9 @@ def Command_Calculate():
         MSE = ARIMARMSE
     elif modelName.get() == 1:  # VAR
         steps_to_predict = (pd.to_datetime(selected_date) - train.index[-1]).days // 7
-        var_predictions = VARmodel.forecast(train.values[-VARmodel.k_ar:], steps=steps_to_predict)
+        var_predictions = VARmodel.forecast(VARtrain.values[-VARmodel.k_ar:], steps=steps_to_predict)
         predicted_value = var_predictions[-1, 0]  # 예: 'MOVIE_ADNC_CO' 컬럼의 예측값
-        print(VARmodel.forecast(train.values[-VARmodel.k_ar:], steps=steps_to_predict))
+        print(VARmodel.forecast(VARtrain.values[-VARmodel.k_ar:], steps=steps_to_predict))
         MSE = VARRMSE
     else:
         predicted_value = "Invalid model type"
