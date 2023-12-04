@@ -5,11 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg
 import pandas as pd
 from Model import ARIMAM, VARM, EstimateRMSE
-import os
 
-print(os.getcwd())
-
-# ["강원도","강원도","경기도","경상남도","경상북도","광주광역시","대구광역시","대전광역시","부산광역시","서울특별시","세종특별시","울산광역시","인천광역시","전라남도","전라북도","제주특별자치도","충청남도","충청북도"]
 years = [x for x in range(2023,2030)]
 months = [x for x in range(1,13)]
 days = [x for x in range(1,32)]
@@ -31,16 +27,17 @@ def Command_Radio():
         model, train, test, prediction = ARIMAmodel, ARIMAtrain, ARIMAtest, ARIMAprediction
         print("ARIMA")
     elif modelName.get() == 1:
-        model, train, test, prediction = VARmodel, VARtrain, VARtest, VARprediction
+        model, train, test, prediction = VARmodel, VARtrain['MOVIE_ADNC_CO'], VARtest['MOVIE_ADNC_CO'], VARprediction['MOVIE_ADNC_CO']
         print("VAR")
 
 def Command_Button():
     print("Clicked")
     global model, train, test, prediction
+    print(train)
     plt.figure(figsize=(10, 6))
-    plt.plot(train.index, train['MOVIE_ADNC_CO'], label='Training Data')
-    plt.plot(test.index, test['MOVIE_ADNC_CO'], label='Actual Data', color='orange')
-    plt.plot(test.index, prediction['MOVIE_ADNC_CO'], label='Forecast', color='green')
+    plt.plot(train.index, train, label='Training Data')
+    plt.plot(test.index, test, label='Actual Data', color='orange')
+    plt.plot(test.index, prediction, label='Forecast', color='green')
     if modelName.get() == 0:
         plt.title("Movie Attendance Forecast - ARIMA")
     elif modelName.get() == 1:
