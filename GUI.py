@@ -7,7 +7,7 @@ from Model import ARIMAM, VARM
 import os
 
 print(os.getcwd())
- 
+
 # ["강원도","강원도","경기도","경상남도","경상북도","광주광역시","대구광역시","대전광역시","부산광역시","서울특별시","세종특별시","울산광역시","인천광역시","전라남도","전라북도","제주특별자치도","충청남도","충청북도"]
 years = [x for x in range(2019,2025)]
 months = [x for x in range(1,13)]
@@ -41,13 +41,15 @@ def Command_Button():
         ax2.set_title("VAR")
     ax2.cla()
     global model, train, test, prediction
-    line = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(figure,frame_graph)
-    line.get_tk_widget().pack(side="left")
-    train.plot(kind='line',legend=True,ax=ax2,label='Train Data')
-    test.plot(kind="line",legend=True,ax=ax2,label='Actual Data',color='orange')
-    prediction.plot(kind="line",legend=True,ax=ax2,label='Prediction',color='green')
-    window.update()
-    window.update_idletasks()
+    plt.figure(figsize=(10, 6))
+    plt.plot(train.index, train, label='Training Data')
+    plt.plot(test.index, test, label='Actual Data', color='orange')
+    plt.plot(test.index, prediction, label='Forecast', color='green')
+    plt.title('Movie Attendance Forecast')
+    plt.xlabel('Date')
+    plt.ylabel('Movie Attendance')
+    plt.legend()
+    plt.show()
 
 # GUI
 WIN_WIDTH = 920
