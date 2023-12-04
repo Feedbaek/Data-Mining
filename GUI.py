@@ -16,8 +16,8 @@ quarter = [str(x)+"분기" for x in range(1,5)]
 
 
 # Prediction model
-ARIMAmodel, ARIMAtrain, ARIMAtest, ARIMAprediction = ARIMAM('./DM_MovieCustomerPrediction/CI_MOVIE_VIEWING_INFO_202302.csv')
-VARmodel, VARtrain, VARtest, VARprediction = VARM('./DM_MovieCustomerPrediction/CI_MOVIE_VIEWING_INFO_202302.csv')
+ARIMAmodel, ARIMAtrain, ARIMAtest, ARIMAprediction = ARIMAM('CI_MOVIE_VIEWING_INFO_202302.csv')
+VARmodel, VARtrain, VARtest, VARprediction = VARM('CI_MOVIE_VIEWING_INFO_202302.csv')
 VARtrain,VARtest,VARprediction = VARtrain['MOVIE_ADNC_CO'],VARtest['MOVIE_ADNC_CO'],VARprediction['MOVIE_ADNC_CO']
 
 model, train, test, prediction = None,None,None,None
@@ -27,12 +27,27 @@ def temp():
     global model, train, test, prediction
     if modelName.get() == 0:
         model, train, test, prediction = ARIMAmodel, ARIMAtrain, ARIMAtest, ARIMAprediction
+        print("ARIMA")
     elif modelName.get() == 1:
         model, train, test, prediction = VARmodel, VARtrain, VARtest, VARprediction
+        print("VAR")
 
-def printtemp():
+def Command_Button():
+    print("Clicked")
+    global ax2
+    if modelName.get() == 0:
+        ax2.set_title("ARIMA")
+    elif modelName.get() == 1:
+        ax2.set_title("VAR")
+    ax2.cla()
     global model, train, test, prediction
-    print(prediction)
+    line = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(figure,frame_graph)
+    line.get_tk_widget().pack(side="left")
+    train.plot(kind='line',legend=True,ax=ax2,label='Train Data')
+    test.plot(kind="line",legend=True,ax=ax2,label='Actual Data',color='orange')
+    prediction.plot(kind="line",legend=True,ax=ax2,label='Prediction',color='green')
+    window.update()
+    window.update_idletasks()
 
 # GUI
 WIN_WIDTH = 920
@@ -71,14 +86,14 @@ ax2 = figure.add_subplot(111)
 
 ## tkinter
 frame_graph = Frame(window,relief="flat",background="black")
-canvas_graph = Canvas(frame_graph)
 
-if modelName == 0 or modelName == 1:
-    line = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(figure,frame_graph)
-    line.get_tk_widget().pack(side="left")
-    train.plot(kind='line',legend=True,ax=ax2,label='Train Data')
-    test.plot(kind="line",legend=True,ax=ax2,label='Actual Data',color='orange')
-    prediction.plot(kind="line",legend=True,ax=ax2,label='Prediction',color='green')
+
+# if modelName == 0 or modelName == 1:
+#     line = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(figure,frame_graph)
+#     line.get_tk_widget().pack(side="left")
+#     train.plot(kind='line',legend=True,ax=ax2,label='Train Data')
+#     test.plot(kind="line",legend=True,ax=ax2,label='Actual Data',color='orange')
+#     prediction.plot(kind="line",legend=True,ax=ax2,label='Prediction',color='green')
 
 
 #canvas_graph.pack(fill="both")
@@ -93,13 +108,9 @@ combobox_year.set("year")
 combobox_month = ttk.Combobox(labelframe_date,width=5,height=10,values=months,state="readonly")
 combobox_month.set("month")
 radio_ARIMA = Radiobutton(labelframe_model,text="ARIMA",value=0,font=contentFont,variable=modelName,command=temp)
-print(str(modelName.get()))
 radio_other = Radiobutton(labelframe_model,text="VAR",value=1,font=contentFont,variable=modelName,command=temp)
-print(str(modelName.get()))
-#label_inputDate = Label(labelframe_input,text="Date")
-button_calculate = Button(labelframe_input,width=10,height=3,text="Calculate",font=semi_titleFont,command=printtemp)
+button_calculate = Button(labelframe_input,width=10,height=3,text="Calculate",font=semi_titleFont,command=Command_Button)
 
-#label_inputDate.place()
 combobox_year.pack(side="left",padx=5,pady=5)
 combobox_month.pack(side="right",padx=5,pady=5)
 labelframe_date.pack(side="left",padx=10,pady=5)
