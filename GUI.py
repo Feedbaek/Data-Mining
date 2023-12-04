@@ -7,7 +7,7 @@ from Model import ARIMAM, VARM
 import os
 
 print(os.getcwd())
- 
+
 # ["강원도","강원도","경기도","경상남도","경상북도","광주광역시","대구광역시","대전광역시","부산광역시","서울특별시","세종특별시","울산광역시","인천광역시","전라남도","전라북도","제주특별자치도","충청남도","충청북도"]
 years = [x for x in range(2019,2025)]
 months = [x for x in range(1,13)]
@@ -48,6 +48,30 @@ def Command_Button():
     plt.ylabel('Movie Attendance')
     plt.legend()
     plt.show()
+
+def Command_Calculate():
+	print("Clicked")
+	global model, train, test, prediction, entry_output, entry_accuracy
+
+	# 사용자가 선택한 년도와 월 가져오기
+	selected_year = combobox_year.get()
+	selected_month = combobox_month.get()
+
+	# 날짜 형식으로 변환 (예: '2023-04-01')
+	selected_date = f"{selected_year}-{selected_month.zfill(2)}-01"
+
+	# 예측 모델 선택
+	if modelName.get() == 0:
+		model_type = 'ARIMA'
+	elif modelName.get() == 1:
+		model_type = 'VAR'
+
+	# 예측 수행
+	predicted_value = model.forecast(selected_date, model_type)
+
+	# 예측 결과 표시
+	entry_output.delete(0, END)
+	entry_output.insert(0, str(predicted_value))
 
 # GUI
 WIN_WIDTH = 920
@@ -111,7 +135,7 @@ combobox_month = ttk.Combobox(labelframe_date,width=5,height=10,values=months,st
 combobox_month.set("month")
 radio_ARIMA = Radiobutton(labelframe_model,text="ARIMA",value=0,font=contentFont,variable=modelName,command=Command_Radio)
 radio_other = Radiobutton(labelframe_model,text="VAR",value=1,font=contentFont,variable=modelName,command=Command_Radio)
-button_calculate = Button(labelframe_input,width=10,height=3,text="Calculate",font=semi_titleFont,command=Command_Button)
+button_calculate = Button(labelframe_input,width=10,height=3,text="Calculate",font=semi_titleFont,command=Command_Calculate)
 
 combobox_year.pack(side="left",padx=5,pady=5)
 combobox_month.pack(side="right",padx=5,pady=5)
