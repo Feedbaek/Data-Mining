@@ -3,6 +3,7 @@ from tkinter import ttk
 import tkinter.font as tkft
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg
+import pandas as pd
 from Model import ARIMAM, VARM
 import os
 
@@ -14,11 +15,9 @@ months = [x for x in range(1,13)]
 quarter = [str(x)+"분기" for x in range(1,5)]
 
 
-
 # Prediction model
 ARIMAmodel, ARIMAtrain, ARIMAtest, ARIMAprediction = ARIMAM('CI_MOVIE_VIEWING_INFO_202302.csv')
 VARmodel, VARtrain, VARtest, VARprediction = VARM('CI_MOVIE_VIEWING_INFO_202302.csv')
-VARtrain,VARtest,VARprediction = VARtrain['MOVIE_ADNC_CO'],VARtest['MOVIE_ADNC_CO'],VARprediction['MOVIE_ADNC_CO']
 
 model, train, test, prediction = None,None,None,None
 
@@ -50,28 +49,34 @@ def Command_Button():
     plt.show()
 
 def Command_Calculate():
-	print("Clicked")
-	global model, train, test, prediction, entry_output, entry_accuracy
+    print("Calculate button clicked")
+    global model, train, test, prediction, entry_output
 
-	# 사용자가 선택한 년도와 월 가져오기
-	selected_year = combobox_year.get()
-	selected_month = combobox_month.get()
+    # 사용자가 선택한 년도와 월 가져오기
+    selected_year = int(combobox_year.get())
+    selected_month = int(combobox_month.get())
 
-	# 날짜 형식으로 변환 (예: '2023-04-01')
-	selected_date = f"{selected_year}-{selected_month.zfill(2)}-01"
+    # 날짜 형식으로 변환 (예: '2023-04-01')
+    selected_date = f"{selected_year}-{selected_month:02d}-01"
 
-	# 예측 모델 선택
-	if modelName.get() == 0:
-		model_type = 'ARIMA'
-	elif modelName.get() == 1:
-		model_type = 'VAR'
+    # 예측 모델 선택 및 예측 수행
+    if modelName.get() == 0:  # ARIMA
+        steps_to_predict = (pd.to_datetime(selected_date) - train.index[-1]).days // 7
+        predicted_value = ARIMAmodel.forecast(steps=steps_to_predict)[-1]
+    elif modelName.get() == 1:  # VAR
+        steps_to_predict = (pd.to_datetime(selected_date) - train.index[-1]).days // 7
+        var_predictions = VARmodel.forecast(train.values[-VARmodel.k_ar:], steps=steps_to_predict)
+        predicted_value = var_predictions[-1, 0]  # 예: 'MOVIE_ADNC_CO' 컬럼의 예측값
+    else:
+        predicted_value = "Invalid model type"
 
-	# 예측 수행
-	predicted_value = model.forecast(selected_date, model_type)
+    print(f"Predicted value: {predicted_value}")
 
-	# 예측 결과 표시
-	entry_output.delete(0, END)
-	entry_output.insert(0, str(predicted_value))
+    # 예측 결과 표시
+    entry_output.configure(state='normal')
+    entry_output.delete(0, END)
+    entry_output.insert(0, f"{predicted_value:,.0f}")
+    entry_output.configure(state='readonly')
 
 # GUI
 WIN_WIDTH = 920
@@ -150,7 +155,7 @@ labelframe_input.place(x=10,y=100)
 labelframe_output = LabelFrame(window,text="Output",font=semi_titleFont)
 labelframe_accuracy = LabelFrame(labelframe_output,text="Accuracy",font=contentFont)
 labelframe_estimatedCustomers = LabelFrame(labelframe_output,text="Estimated number of customers",font=contentFont)
-entry_output = Entry(labelframe_estimatedCustomers,state='readonly',textvariable="0000000000",width=30)
+entry_output = Entry(labelframe_estimatedCustomers,state='readonly',textvariable="0000000000",width=15)
 entry_accuracy = Entry(labelframe_accuracy,state='readonly',textvariable="0000000000",width=15)
 label_percent = Label(labelframe_accuracy,text="%")
 
